@@ -1,34 +1,13 @@
 <?php
 
-get_header(); ?>
+get_header();
+pageBanner(
+    array(
+        'title' => get_the_archive_title(),
+        'subtitle' => get_the_archive_description()
 
-<div class="page-banner">
-    <div class="page-banner__bg-image"
-        style="background-image: url(<?php echo get_theme_file_uri('/images/ocean.jpg') ?>)">
-    </div>
-    <div class="page-banner__content container container--narrow">
-        <h1 class="page-banner__title">
-            <!-- personalise category page  -->
-            <?php if (is_category()) {
-                single_cat_title();
-                echo ' Category';
-            } elseif (is_author()) {
-                echo 'Posts By ';
-                the_author();
-            } else {
-                // will pull catregories for year and date etc. whilst still allowing for personalisation of cat display above in echo statements.
-                the_archive_title();
-            }
-            ?>
-
-        </h1>
-        <div class="page-banner__intro">
-            <p>
-                <?php the_archive_description(); ?>
-            </p>
-        </div>
-    </div>
-</div>
+    )
+) ?>
 
 <div class="container container--narrow page-section">
 

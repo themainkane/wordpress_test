@@ -1,5 +1,52 @@
 <?php
 
+// function pageBanner($args = null)
+// {
+//   if (!isset($args['title'])) {
+//     $args['title'] = get_the_title();
+//   }
+
+//   if (!isset($args['subtitle'])) {
+//     $args['subtitle'] = get_field('page_banner_subtitle');
+//   }
+//   if (!isset($args['photo'])) {
+//     if (get_field('page_banner_background_image') and !is_archive() and !is_home()) {
+//       $args['photo'] = get_field('page_banner_background_image')['sizes']['pageBanner'];
+//     } else {
+//       $args['photo'] = get_theme_file_uri('images/ocean.jpg');
+//     }
+//   }
+
+//  
+// }
+
+// ******simplified from the messy if statements in the course. 
+function pageBanner($args = null)
+{
+  $title = $args['title'] ?? get_the_title();
+  $subtitle = $args['subtitle'] ?? get_field('page_banner_subtitle');
+  $photo = $args['photo'] ?? (
+    get_field('page_banner_background_image') && !is_archive() && !is_home() ?
+    get_field('page_banner_background_image')['sizes']['pageBanner'] :
+    get_theme_file_uri('images/ocean.jpg')
+  );
+  ?>
+  <div class="page-banner">
+    <div class="page-banner__bg-image" style="background-image: url(<?= $photo ?>)">
+    </div>
+    <div class="page-banner__content container container--narrow">
+      <h1 class="page-banner__title">
+        <?= $title ?>
+      </h1>
+      <div class="page-banner__intro">
+        <p>
+          <?= $subtitle ?>
+        </p>
+      </div>
+    </div>
+  </div>
+  <?php
+}
 function university_files()
 {
   wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);
@@ -18,8 +65,11 @@ function universtiy_features()
   // register_nav_menu('footerLocationTwo', 'Footer Location Two');
   add_theme_support('title-tag');
   add_theme_support('post-thumbnails');
-  add_image_size('professor-landscape', 400, 260, true);
-  add_image_size('professor_portrate', 480, 650, true);
+  // custom cropping can be acheived by the array as the last argument. 
+  // add_image_size('professorLandscape', 400, 260, array('left', 'top'));
+  add_image_size('professorLandscape', 400, 260, true);
+  add_image_size('professorPortrait', 480, 650, true);
+  add_image_size('pageBanner', 1500, 350, true);
 }
 add_action('after_setup_theme', 'universtiy_features');
 
