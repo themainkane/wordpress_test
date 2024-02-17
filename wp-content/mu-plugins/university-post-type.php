@@ -86,6 +86,36 @@ function university_post_types()
             'menu_icon' => 'dashicons-welcome-learn-more'
         )
     );
+
+    register_post_type(
+        // posttype is the slug for the url 'event' in this case unless rewrite used
+        'campus',
+        array(
+            // makes custom post time available in restful API
+            'show_in_rest' => true,
+            // must inclie show inrest and supports => editor to see modern block editor
+            'supports' => array(
+                'title',
+                'editor',
+                'excerpt'
+            ),
+            'rewrite' => array(
+                'slug' => 'campuses'
+            ),
+            'has_archive' => true,
+            'public' => true,
+            'labels' => array(
+                'name' => 'Campuses',
+                'show_in_rest' => true,
+                'add_new_item' => 'Add New Campus',
+                'edit_item' => 'Edit Campus',
+                'all_items' => 'All Campuses',
+                'singular_name' => 'Campus'
+
+            ),
+            'menu_icon' => 'dashicons-locations-alt'
+        )
+    );
 }
 
 add_action('init', 'university_post_types');
