@@ -64,7 +64,7 @@ while (have_posts()) {
                     <a href="<?php the_permalink(); ?>">
                         <?php the_title(); ?>
                         </span>
-
+                    </a>
                 </li>
             <?php }
             echo '</ul>';
@@ -74,6 +74,7 @@ while (have_posts()) {
         wp_reset_postdata();
 
         // $today = date('Ymd');
+        $today = date('Ymd');
         $relatedEvents = new WP_Query(
             array(
                 'posts_per_page' => -1,
