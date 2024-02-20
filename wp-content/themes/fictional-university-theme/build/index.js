@@ -23,9 +23,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Instantiate a new object using our modules/classes
-const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default"]();
-const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
+
 document.addEventListener("DOMContentLoaded", () => {
+  const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  const googleMap = new _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__["default"]();
   const search = new _modules_Search__WEBPACK_IMPORTED_MODULE_4__["default"]();
 });
 
@@ -206,10 +208,10 @@ class Search {
     console.log(this.openButton);
   }
   openOverlay() {
-    this.openButton.addEventListener("click", () => {
+    this.openButton.addEventListener("click", function () {
       this.searchOverlay.classList.add("search-overlay--active");
       console.log("click registered");
-    });
+    }.bind(this));
   }
   closeOverlay() {
     this.closeButton.addEventListener("click", () => {

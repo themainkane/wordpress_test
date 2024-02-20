@@ -14,9 +14,11 @@ class Search {
 
   openOverlay() {
     this.openButton.addEventListener(
-      function () {
+      "click",
+      function (e) {
+        e.stopPropagation();
         this.searchOverlay.classList.add("search-overlay--active");
-        console.log("click registered");
+        console.log("open overlay was called");
       }.bind(this)
     );
   }
