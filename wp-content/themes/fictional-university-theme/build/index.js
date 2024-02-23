@@ -185,6 +185,36 @@ class MobileMenu {
 
 /***/ }),
 
+/***/ "./src/modules/Result.js":
+/*!*******************************!*\
+  !*** ./src/modules/Result.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Result)
+/* harmony export */ });
+class Result {
+  constructor(title, href, excerpt) {
+    this.title = title;
+    this.href = href;
+    this.excerpt = excerpt;
+    this.resultsDiv = document.getElementById("search-overlay__results");
+    this.refreshElement();
+  }
+  refreshElement() {
+    this.resultsDiv.innerHTML += `
+      <a href="${this.href}">
+      <h3>${this.title.rendered}</h3>
+      </a>
+      ${this.excerpt.rendered}
+    `;
+  }
+}
+
+/***/ }),
+
 /***/ "./src/modules/Search.js":
 /*!*******************************!*\
   !*** ./src/modules/Search.js ***!
@@ -195,6 +225,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _Result__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Result */ "./src/modules/Result.js");
+
 class Search {
   constructor() {
     this.openButton = document.querySelector(".js-search-trigger");
@@ -208,7 +240,6 @@ class Search {
     this.previousValue;
     this.typingTimer;
     this.addEventListners();
-    this.loadSearchResults();
   }
   addEventListners() {
     this.openButton.addEventListener("click", e => {
@@ -236,13 +267,11 @@ class Search {
     this.searchOverlay.classList.add("search-overlay--active");
     this.body.classList.add("body-no-scroll");
     this.toggleOverlay();
-    console.log("open overlay was called");
   }
   closeOverlay() {
     this.searchOverlay.classList.remove("search-overlay--active");
     this.body.classList.remove("body-no-scroll");
     this.toggleOverlay();
-    console.log("close overlay was called");
   }
   keyPressDispatcher(e) {
     // note the difference in the use of && operator for double keystrokes.
@@ -279,9 +308,8 @@ class Search {
         }
         //display results
         this.typingTimer = setTimeout(() => {
+          this.loadSearchResults();
           this.toggleSpinner();
-          console.log("resultsDiv:", this.resultsDiv);
-          // this.resultsDiv.innerHTML = `working`; ****CALL SEARCH API HERE****
         }, 2000);
       } else {
         this.resultsDiv.innerHTML = ``;
@@ -299,12 +327,17 @@ class Search {
   // }
 
   loadSearchResults = async () => {
-    const response = await fetch(`/wp-json/wp/v2/posts?search=biology`);
+    const response = await fetch(`/wp-json/wp/v2/posts?search=${this.searchField.value}`);
     const data = await response.json();
-    console.log(data);
-    // const results = data.array.forEach(el => {
-
-    // });
+    console.log("data", data);
+    this.resultsDiv.innerHTML = `<h2>Search Results</h2>
+      <hr class="section-break"></hr>`;
+    data.length ? data.forEach(e => {
+      const result = new _Result__WEBPACK_IMPORTED_MODULE_0__["default"](e.title, e.link, e.excerpt);
+      console.log("result:", result);
+    }) : this.resultsDiv.innerHTML += `
+      <p>No results matches that criteria</p>
+      `;
   };
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Search);
