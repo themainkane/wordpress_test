@@ -105,7 +105,7 @@ while (have_posts()) {
 
         if ($relatedCampuses) {
             echo '<hr class= "section-break">';
-            echo '<h2 class="headline headline--medium">' . get_the_title() . 'is available at these campuses: </h2>';
+            echo '<h2 class="headline headline--medium">' . get_the_title() . ' is available at these campuses: </h2>';
             echo '<ul>';
             foreach ($relatedCampuses as $campus) { ?>
                 <li><a href="<?= get_the_permalink($campus); ?>">

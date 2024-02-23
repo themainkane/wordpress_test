@@ -13,6 +13,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/MobileMenu */ "./src/modules/MobileMenu.js");
 /* harmony import */ var _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/HeroSlider */ "./src/modules/HeroSlider.js");
 /* harmony import */ var _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/GoogleMap */ "./src/modules/GoogleMap.js");
+/* harmony import */ var _modules_Search__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/Search */ "./src/modules/Search.js");
 
 
 // Our modules / classes
@@ -22,9 +23,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Instantiate a new object using our modules/classes
-const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default"]();
-const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
-const googleMap = new _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__["default"]();
+
+document.addEventListener("DOMContentLoaded", () => {
+  const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  const googleMap = new _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__["default"]();
+  const search = new _modules_Search__WEBPACK_IMPORTED_MODULE_4__["default"]();
+});
 
 /***/ }),
 
@@ -177,6 +182,165 @@ class MobileMenu {
   }
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MobileMenu);
+
+/***/ }),
+
+/***/ "./src/modules/Result.js":
+/*!*******************************!*\
+  !*** ./src/modules/Result.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Result)
+/* harmony export */ });
+class Result {
+  constructor(title, href, excerpt) {
+    this.title = title;
+    this.href = href;
+    this.excerpt = excerpt;
+    this.resultsDiv = document.getElementById("search-overlay__results");
+    this.refreshElement();
+  }
+  refreshElement() {
+    this.resultsDiv.innerHTML += `
+      <a href="${this.href}">
+      <h3>${this.title.rendered}</h3>
+      </a>
+      ${this.excerpt.rendered}
+    `;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/modules/Search.js":
+/*!*******************************!*\
+  !*** ./src/modules/Search.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _Result__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Result */ "./src/modules/Result.js");
+
+class Search {
+  constructor() {
+    this.openButton = document.querySelector(".js-search-trigger");
+    this.closeButton = document.querySelector(".search-overlay__close");
+    this.searchOverlay = document.querySelector(".search-overlay");
+    this.searchField = document.querySelector("#search-term");
+    this.body = document.body;
+    this.isOverlayOpen = false;
+    this.isSpinnerVisible = false;
+    this.resultsDiv = document.getElementById("search-overlay__results");
+    this.previousValue;
+    this.typingTimer;
+    this.addEventListners();
+  }
+  addEventListners() {
+    this.openButton.addEventListener("click", e => {
+      // seems to prevent "bubbling" event listners were not previously addig to the page
+      e.stopPropagation();
+      e.preventDefault();
+      this.openOverlay();
+    });
+    this.closeButton.addEventListener("click", e => {
+      e.stopPropagation();
+      this.closeOverlay();
+    });
+    this.body.addEventListener("keyup", e => {
+      this.keyPressDispatcher(e);
+    });
+    this.searchField.addEventListener("keyup", e => {
+      e.stopPropagation();
+      this.typingLogic();
+    });
+  }
+
+  //  methods
+
+  openOverlay() {
+    this.searchOverlay.classList.add("search-overlay--active");
+    this.body.classList.add("body-no-scroll");
+    this.toggleOverlay();
+  }
+  closeOverlay() {
+    this.searchOverlay.classList.remove("search-overlay--active");
+    this.body.classList.remove("body-no-scroll");
+    this.toggleOverlay();
+  }
+  keyPressDispatcher(e) {
+    // note the difference in the use of && operator for double keystrokes.
+    if (e.code === "KeyS" && "AltLeft" && !this.isOverlayOpen && !this.isInputFocused()) {
+      this.openOverlay();
+    } else if (e.code === "Escape" && this.isOverlayOpen === true) {
+      this.closeOverlay();
+    }
+  }
+
+  // logic to check if input field is currently the focus of the document
+  isInputFocused() {
+    const focusedElement = document.activeElement;
+    return focusedElement && (focusedElement.tagName === "INPUT" || focusedElement.tagName === "TEXTAREA");
+  }
+  toggleOverlay() {
+    this.isOverlayOpen === true ? this.isOverlayOpen = false : this.isOverlayOpen = true;
+  }
+  toggleSpinner() {
+    this.isSpinnerVisible === true ? this.isSpinnerVisible = false : this.isSpinnerVisible = true;
+  }
+
+  // search logic below!*************
+  typingLogic() {
+    // if the search field changes (not on arrow keys etc)
+    if (this.searchField.value !== this.previousValue) {
+      //clear timeout
+      clearTimeout(this.typingTimer);
+      //will not run if you just emptied the searchfield (if this.searchField is flasy)
+      if (this.searchField.value) {
+        if (!this.isSpinnerVisible) {
+          this.resultsDiv.innerHTML = `<div class="spinner-loader"></div>`;
+          this.toggleSpinner();
+        }
+        //display results
+        this.typingTimer = setTimeout(() => {
+          this.loadSearchResults();
+          this.toggleSpinner();
+        }, 2000);
+      } else {
+        this.resultsDiv.innerHTML = ``;
+        this.isSpinnerVisible = false;
+      }
+      // handle the spinner, and only open if not already spinning
+      //
+      this.previousValue = this.searchField.value;
+    }
+  }
+  // getResults() {
+  //   console.log("get resutls called!");
+  //   console.log("resultsDiv:", this.resultsDiv);
+  //   this.resultsDiv.innerHTML = `working`;
+  // }
+
+  loadSearchResults = async () => {
+    const response = await fetch(`/wp-json/wp/v2/posts?search=${this.searchField.value}`);
+    const data = await response.json();
+    console.log("data", data);
+    this.resultsDiv.innerHTML = `<h2>Search Results</h2>
+      <hr class="section-break"></hr>`;
+    data.length ? data.forEach(e => {
+      const result = new _Result__WEBPACK_IMPORTED_MODULE_0__["default"](e.title, e.link, e.excerpt);
+      console.log("result:", result);
+    }) : this.resultsDiv.innerHTML += `
+      <p>No results matches that criteria</p>
+      `;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Search);
 
 /***/ }),
 
